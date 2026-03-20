@@ -1,4 +1,4 @@
-# 🔢 Polynomial Regression — Fitting Curves to Data
+#  Polynomial Regression — Fitting Curves to Data
 
 ## What's This About?
 

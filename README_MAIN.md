@@ -26,8 +26,8 @@ It serves as a learning resource and toolkit for understanding, experimenting wi
 
 ## Repository Structure
 regression
-│── notebooks/         # Jupyter notebooks with tutorials
-│── src/               # Source code for regression models
+|── dataset            # dataset on which model is build
+│── notebooks/         # Jupyter notebooks with tutorials and source code
 │── README.md          # Documentation
 
 
