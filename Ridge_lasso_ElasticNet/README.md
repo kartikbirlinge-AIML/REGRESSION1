@@ -54,6 +54,48 @@ seaborn
 scikit-learn
 ```
 
+## NOTE:
+# 🧠 Why Linear Models (Ridge, Lasso, Elastic Net) Are Limited for Medical Data
+
+---
+
+## 📌 Overview
+
+Linear models assume a linear relationship between input features and the target variable. While they are simple, interpretable, and useful as baseline models, medical data often violates these assumptions.
+
+---
+
+## 🧠 1. Medical Data is Rarely Linear
+
+Linear models assume:
+```python
+y = w1*x1 + w2*x2 + ... + wn*xn
+```
+
+However, in healthcare:
+
+- Disease risk is **not** a straight-line relationship
+- **Example:** Blood pressure + cholesterol + genetics → interact **nonlinearly**
+
+> 👉 Linear models struggle to capture these complex relationships.
+
+---
+
+## 🔀 2. Complex Feature Interactions
+
+Medical variables often interact with each other:
+
+- Age × BMI × Lifestyle
+- Drug interactions
+- Gene combinations
+
+Linear models:
+
+- Do **not** automatically learn interactions
+- Only combine features **additively**
+
+> 👉 Interaction terms must be manually engineered, which is not scalable.
+
 ## Usage
 
 Open the notebook in Google Colab or Jupyter and run cells sequentially.
