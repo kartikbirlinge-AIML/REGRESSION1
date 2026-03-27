@@ -1,0 +1,171 @@
+====================================================================
+RIDGE, LASSO & ELASTICNET REGRESSION — ALGORITHMS & CODE REFERENCE
+====================================================================
+
+----------------------------------------------------------------------
+1. ALGORITHMS
+----------------------------------------------------------------------
+
+LINEAR REGRESSION (Baseline)
+─────────────────────────────
+Ordinary Least Squares (OLS) minimizes the Residual Sum of Squares (RSS):
+
+    Loss = Σ (yᵢ - ŷᵢ)²
+
+No regularization is applied. It is prone to overfitting when features
+are highly correlated (multicollinearity).
+
+
+RIDGE REGRESSION (L2 Regularization)
+──────────────────────────────────────
+Adds a penalty equal to the square of the magnitude of coefficients:
+
+    Loss = Σ (yᵢ - ŷᵢ)² + α · Σ βⱼ²
+
+- α (alpha): regularization strength. Higher α → smaller coefficients.
+- Shrinks all coefficients towards zero but never sets them exactly to zero.
+- Best for: datasets where all features contribute and multicollinearity
+  is present.
+- Key class: sklearn.linear_model.Ridge / RidgeCV (cross-validated α)
+
+
+LASSO REGRESSION (L1 Regularization)
+──────────────────────────────────────
+Adds a penalty equal to the absolute value of the magnitude of coefficients:
+
+    Loss = Σ (yᵢ - ŷᵢ)² + α · Σ |βⱼ|
+
+- α (alpha): regularization strength.
+- Can shrink some coefficients to exactly zero → automatic feature selection.
+- Best for: sparse models where only a few features are relevant.
+- Key class: sklearn.linear_model.Lasso / LassoCV (cross-validated α)
+
+
+ELASTICNET REGRESSION (L1 + L2 Combined)
+──────────────────────────────────────────
+Combines both L1 and L2 penalties:
+
+    Loss = Σ (yᵢ - ŷᵢ)² + α · [ρ · Σ|βⱼ| + (1-ρ)/2 · Σβⱼ²]
+
+- α (alpha): overall regularization strength.
+- ρ (l1_ratio): mix between L1 and L2. 0 = pure Ridge, 1 = pure Lasso.
+- Best for: datasets with many correlated features.
+- Key class: sklearn.linear_model.ElasticNet / ElasticNetCV
+
+
+----------------------------------------------------------------------
+2. KEY CODE
+----------------------------------------------------------------------
+
+--- IMPORTS ---
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_diabetes
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+
+--- DATA LOADING & FEATURE SELECTION ---
+df = load_diabetes(as_frame=True).frame
+
+# Check correlations with target
+correlations = df.corr()['target'].sort_values(ascending=False)
+high_corr_features = correlations[correlations > 0.4]
+
+# Keep only high-correlation features
+x = df.drop(columns=["target", "age", "sex", "bp", "s2", "s1", "s3", "s6"], axis=1)
+y = df.target
+
+
+--- TRAIN/TEST SPLIT & SCALING ---
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=42)
+
+scaler = StandardScaler()
+x_train = scaler.fit_transform(x_train)
+x_test  = scaler.transform(x_test)
+
+
+--- LINEAR REGRESSION (Baseline) ---
+from sklearn.linear_model import LinearRegression
+linreg = LinearRegression()
+linreg.fit(x_train, y_train)
+y_pred = linreg.predict(x_test)
+
+
+--- RIDGE REGRESSION ---
+from sklearn.linear_model import Ridge, RidgeCV
+
+# Default alpha
+ridge = Ridge()
+ridge.fit(x_train, y_train)
+y_pred = ridge.predict(x_test)
+
+# Cross-validated alpha selection
+ridgecv = RidgeCV(cv=5)
+ridgecv.fit(x_train, y_train)
+y_pred = ridgecv.predict(x_test)
+print("Best alpha:", ridgecv.alpha_)   # → 10.0
+
+
+--- LASSO REGRESSION ---
+from sklearn.linear_model import Lasso, LassoCV
+
+# Default alpha
+lasso = Lasso()
+lasso.fit(x_train, y_train)
+y_pred = lasso.predict(x_test)
+
+# Cross-validated alpha selection
+lassocv = LassoCV(cv=5)
+lassocv.fit(x_train, y_train)
+y_pred = lassocv.predict(x_test)
+print("Best alpha:", lassocv.alpha_)   # → ~0.046
+
+
+--- ELASTICNET REGRESSION ---
+from sklearn.linear_model import ElasticNet, ElasticNetCV
+
+# Default
+elastic = ElasticNet()
+elastic.fit(x_train, y_train)
+y_pred = elastic.predict(x_test)
+
+# Cross-validated
+elasticnetcv = ElasticNetCV(cv=5)
+elasticnetcv.fit(x_train, y_train)
+y_pred = elasticnetcv.predict(x_test)
+
+
+--- PERFORMANCE METRICS ---
+mse   = mean_squared_error(y_test, y_pred)
+mae   = mean_absolute_error(y_test, y_pred)
+rmse  = np.sqrt(mse)
+score = r2_score(y_test, y_pred)
+
+print("MSE    :", mse)
+print("MAE    :", mae)
+print("RMSE   :", rmse)
+print("R²     :", score)
+
+# Scatter plot: actual vs predicted
+plt.scatter(y_test, y_pred)
+plt.xlabel("Actual")
+plt.ylabel("Predicted")
+plt.title("Actual vs Predicted")
+plt.show()
+
+
+----------------------------------------------------------------------
+3. WHEN TO USE EACH MODEL
+----------------------------------------------------------------------
+
+| Scenario                                    | Recommended Model |
+|---------------------------------------------|-------------------|
+| All features relevant, multicollinearity    | Ridge             |
+| Many irrelevant features (need selection)   | Lasso             |
+| Many correlated features, need selection    | ElasticNet        |
+| Small dataset, simple relationships         | Linear Regression |
+
+----------------------------------------------------------------------
