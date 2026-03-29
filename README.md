@@ -9,7 +9,6 @@ It serves as a learning resource and toolkit for understanding, experimenting wi
 - **Linear Regression**
 - **Multiple Linear Regression**
 - **Polynomial Regression**
-- **Logistic Regression**
 - **Ridge Regression**
 - **Lasso Regression**
 - **Elastic Net Regression**
@@ -18,7 +17,7 @@ It serves as a learning resource and toolkit for understanding, experimenting wi
 - **Decision Tree Regression**
 - **Random Forest Regression**
 - **Gradient Boosting Regression**
-- **Neural Network Regression**
+  
 
 ---
 
